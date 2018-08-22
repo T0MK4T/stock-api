@@ -2,13 +2,9 @@ const stockKey ='SRCQ8KMX4C613TRO';
 const newsKey = '72f9d35e3fde4f82b0de3f8e0996280a';
 const newsURL = 'https://newsapi.org/v2/top-headlines';
 const symbolURL = 'https://api.iextrading.com/1.0/ref-data/symbols';
-//let stockURL = 'https://www.alphavantage.co/query?function='+stockFunc +'&symbol='+stockSym + '&outputsize=compact&apikey=' + stockKey;
-let stockURL = 'https://www.alphavantage.co/query';
+const stockURL = 'https://www.alphavantage.co/query';
+const symList = [];
 
-let data = {
-	q: 'Microsoft',
-	apiKey: newsKey
-};
 
 function getToday(){
 	let date = new Date();
@@ -27,10 +23,13 @@ function getToday(){
 }
 function renderDashboard(sym,current,low,high){
 	let html = `
-				<h1>${sym}</h1>
+				<h1 class='big-symbol col-12'>${sym}</h1>
                 <h2>${current}</h2>
+                <p>Current Price</p>
                 <h2>${low}</h2>
+                <p>52 Week Low</p>
                 <h2>${high}</h2>
+                </p>52 Week High</p>
 	`
 	$('.big-text').html(html);
 }
@@ -60,17 +59,6 @@ function getStock(q){
 }
 
 function getNews(q){
-	let symList = [];
-	$.getJSON(symbolURL,{},function(data){
-		data.forEach(function(ele){
-			symList.push([ele.symbol,ele.name]);
-		});
-	console.log(symList);
-
-
-		
-	});
-	
 	let query = {
 		q: q,
 		apiKey: newsKey
@@ -78,9 +66,9 @@ function getNews(q){
 
 	$.getJSON(newsURL,query,function(data){
 		console.log(data);
+
 	});
 }
-
 
 function handleSearch(){
 	$('.search-form').on('submit',(function(event){
@@ -91,7 +79,19 @@ function handleSearch(){
 	}))
 }
 
+function getSymbols(lis){
+	$.getJSON(symbolURL,{},function(data){
+		data.forEach(function(ele){
+			let obj = new Object;
+			obj[ele.symbol] = ele.name;
+			lis.push(obj);
+		});
+	console.log(lis);
+	});
+}
+
 function handlePage(){
+	getSymbols(symList); //pull array of symbols and company names
 	handleSearch();
 }
 $(handlePage);
