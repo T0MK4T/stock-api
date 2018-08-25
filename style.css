@@ -1,5 +1,10 @@
+*{
+    box-sizing: border-box;
+}
 body{
     font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
+    padding: 0;
+    margin: 0;
 }
 header{
     border: 1px solid black;
@@ -13,8 +18,46 @@ header{
 main{
     border: 1px solid red;
 }
-.big-text{
+.price-text{
     border: 1px solid blue;
+    padding: 0 10px;
+}
+.price-header{
+    display:flex;
+    flex-wrap: wrap;
+}
+.price-details{
+        display: flex;
+        justify-content: space-between;
+        padding-top: 15px;
+
+}
+.chart-js{
+    height: 200px;
+}
+.graph-buttons{
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px 0;
+}
+.graph-buttons button{
+    font-family: inherit;
+    border: none;
+    background-color: white;
+    text-decoration: none;
+}
+.graph-buttons button:hover{
+    cursor: pointer;
+}
+.graph-buttons button:focus{
+    color: white;
+    background-color: deepskyblue;
+    outline: none;
+    border-radius: 50px;
+
+}
+.company-img{
+    height: 150px;
 }
 .company-news{
     height: 500px;
@@ -42,8 +85,5 @@ main{
     }
     .logo{
         width: 100px;
-    }
-    .big-symbol{
-        text-align: center;
     }
 }

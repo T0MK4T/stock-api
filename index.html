@@ -15,13 +15,45 @@
             </form>
         </header>
         <main>
-            <section class="big-text">
-                <h1>Current Symbol</h1>
-                <h2>Current Price</h2>
-                <h2>Low Price</h2>
-                <h2>High Price</h2>
+            <section class="price-text col-12">
+                <div class="price-header">
+                    <span class="current-symbol col-6">MSFT</span>
+                    <span class="current-price col-6">$129.45</span>
+                </div>
+                <div class="price-details">
+                    <table>
+                        <tr>
+                            <td>High</td>
+                            <td>$120</td>
+                        </tr>
+                        <tr>
+                            <td>Low</td>
+                            <td>$120</td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td>52 Wk High</td>
+                            <td>$120</td>
+                        </tr>
+                        <tr>
+                            <td>52 Wk Low</td>
+                            <td>$120</td>
+                        </tr>
+                    </table>
+                </div>
             </section>
-            <section class="company-info">
+            <section class="graph">
+                <form class="graph-buttons">
+                    <button class="time-button" type="button">1W</button>
+                    <button class="time-button" type="button">1M</button>
+                    <button class="time-button" type="button">3M</button>
+                    <button class="time-button" type="button">1Y</button>
+                    <button class="time-button" type="button">5Y</button>
+                </form>
+                <canvas class="chart-js col-12"></canvas>
+            </section>
+            <section class="company-info col-6">
                 <img class = "company-img" src="/" alt="company pic?"/>
                 <p class="company-about">
 
@@ -30,11 +62,9 @@
 
                 </div>
             </section>
-            <section class="graph">
-
-            </section>
         </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <script src="stocks.js"></script>
     </body>
 </html>
