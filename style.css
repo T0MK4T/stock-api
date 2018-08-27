@@ -1,13 +1,22 @@
 *{
     box-sizing: border-box;
 }
+a{
+    text-decoration: none;
+    color: inherit;
+}
+.center{
+    text-align: center;
+}
 body{
     font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
     padding: 0;
     margin: 0;
+    background: -moz-linear-gradient(45deg, #06876f 0%, #206f87 20%, #2187b7 40%, #4f97ef 60%, #5dc4fc 80%, #46fcfc 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #06876f 0%,#206f87 20%,#2187b7 40%,#4f97ef 60%,#5dc4fc 80%,#46fcfc 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #06876f 0%,#206f87 20%,#2187b7 40%,#4f97ef 60%,#5dc4fc 80%,#46fcfc 100%);
 }
 header{
-    border: 1px solid black;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,25 +24,42 @@ header{
 .logo{
     width: 120px;
 }
+.search-bar{
+    border: none;
+    border-bottom: 1px solid white;
+    color: white;
+    background-color: rgba(0,0,0,0);
+}
+.search-bar::placeholder{
+    color: white;
+}
+
 main{
-    border: 1px solid red;
+
 }
 .price-text{
-    border: 1px solid blue;
+    color: white;
     padding: 0 10px;
+    margin: 20px 0;
+}
+.current-price{
+    font-size: 24px;
+}
+.current-symbol{
+    font-size: 36px;
 }
 .price-header{
     display:flex;
-    flex-wrap: wrap;
+    align-items: center;
 }
 .price-details{
         display: flex;
         justify-content: space-between;
         padding-top: 15px;
-
 }
 .chart-js{
     height: 200px;
+    padding-right: 7px;
 }
 .graph-buttons{
     display: flex;
@@ -41,28 +67,68 @@ main{
     padding: 10px 0;
 }
 .graph-buttons button{
+    color: white;
     font-family: inherit;
     border: none;
-    background-color: white;
+    background-color: rgba(255, 0, 0, 0);
     text-decoration: none;
 }
 .graph-buttons button:hover{
     cursor: pointer;
 }
 .graph-buttons button:focus{
-    color: white;
-    background-color: deepskyblue;
+    color: black;
+    background-color: white;
     outline: none;
     border-radius: 50px;
 
 }
-.company-img{
-    height: 150px;
+.card-style{
+    background-color: rgba(255,255,255,.8);
+    border-radius: 10px;
 }
+.wiki-article{
+    padding: 10px;
+}
+.company-news h1, .company-name{
+    color: white;
+}
+.company-img{
+    float: left;
+    margin-right: 15px;
+    height: 150px;
+    box-shadow: 1px 1px 3px #616363;
+    border-radius: 4px;
+}
+.news-article{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.article-thumb{
+    object-fit: cover;
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+}
+.article-about{
+    flex-flow: column;
+    margin-left: 20px;
+}
+.news-article ul{
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+
+}
+
+/*
 .company-news{
     height: 500px;
     overflow-y: scroll;
-}
+}*/
 .col-1 {width: 8.33%;}
 .col-2 {width: 16.66%;}
 .col-3 {width: 25%;}
@@ -85,5 +151,33 @@ main{
     }
     .logo{
         width: 100px;
+    }
+    .company-info{
+        display:flex;
+        flex-direction: column;
+        padding: 0 10px;
+    }
+    .company-img{
+        height: 100px;
+    }
+    .company-about{
+        padding: 0 5px;
+        font-size: 12px;
+        text-align: justify;
+    }
+    .news-article{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .news-article ul{
+        display: flex;
+        flex-direction: column;
+    }
+    .article-thumb {
+        width: 100px;
+        height: 100px;
+    }
+    .article-about p{
+        display:none;
     }
 }

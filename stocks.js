@@ -8,11 +8,11 @@ const stockDay = {json: 'Time Series (Daily)', path: 'TIME_SERIES_DAILY'};
 const stockWeek = {json:'Weekly Time Series',path: 'TIME_SERIES_WEEKLY'};
 const stockMonth = {json: 'Monthly Time Series',path:'TIME_SERIES_MONTHLY'};
 const symList = new Object;
-let initData = [123,34,45,45,46,56,57,5,45,356,45,6,67,56];
-let myChart;
+let initLabels = ["one","two","three","four","five","six","seven","eight"]
+let initData = [123,34,45,45,46,56,57,5];
+let stockChart;
 
-function getToday(){
-	let date = new Date();
+function formDate(date){
 	let dd = date.getDate();
 	let mm = date.getMonth()+1;
 	let yyyy = date.getFullYear();
@@ -23,97 +23,163 @@ function getToday(){
 	if(mm<10){
 		mm = '0'+mm;
 	}
-	let today = `${yyyy}-${mm}-${dd}`
-	return today;
+	let fDate = `${yyyy}-${mm}-${dd}`
+	return fDate;
 }
 
 function renderWiki(data){
-	let html = `
-			<img class = "company-img" src=${data.thumbnail.source} alt="company pic?"/>
-                <p class="company-about">
-					${data.extract}
-                </p>
+	let html;
+
+	console.log(data);
+    if(!data.extract || data.extract.length<100){
+        html = "<h1>No Wiki Information found</h1>";
+    }else{
+         html = `
+			    <h1 class="company-name">About ${data.title}</h1>
+                    <div class="wiki-article card-style">
+                        <img class = "company-img" src=${data.thumbnail.source} alt=${data.title}/>
+                        <p class="company-about">
+                            ${data.extract}
+                        </p>
+                    </div>
 	`;
-	$('.company-about').html(html);
+    }
+
+	$('.company-wiki').html(html);
 }
 
 function renderNews(data){
-	let html = `
-		${data.articles};
-	`;
+	let html;
+
+	if(data.totalResults>0){
+	   let articles = data.articles;
+	   html = "<h1>Recent News</h1>";
+	   articles.forEach(function(ele){
+	      html += `
+                    <a class="news-article card-style" href = ${ele.url}>
+                        <div class="article-about">
+                            <h2 class="article-title">${ele.title}</h2>
+                            <ul>
+                                <li>${ele.source.name}</li>
+                                <li>${ele.publishedAt}</li>
+                            </ul>
+                        </div>
+                    </a> 
+                    `;
+       });
+    }else{
+        html = `
+	        <h1 class="center"> No Recent Articles Found</h1>
+	  `;
+    }
 	$('.company-news').html(html);
 }
 
 function renderTable(sym,todayData){
 	let html = `
-				<h1 class='current-symbol'>${sym}</h1>
-                <h2 class="current-price">${todayData.close}</h2>
-                <h2>${todayData.tlow}</h2>
-                <p>52 Week Low</p>
-                <h2>${todayData.thigh}</h2>
-                </p>52 Week High</p>
-	`
+            <div class="price-header">
+                    <span class="current-symbol col-6">${sym}</span>
+                    <span class="current-price col-6">${todayData.close}</span>
+                </div>
+                <div class="price-details">
+                    <table>
+                        <tr>
+                            <td>High</td>
+                            <td>${todayData.high}</td>
+                        </tr>
+                        <tr>
+                            <td>Low</td>
+                            <td>${todayData.low}</td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td>52 Wk High</td>
+                            <td>${todayData.thigh}</td>
+                        </tr>
+                        <tr>
+                            <td>52 Wk Low</td>
+                            <td>${todayData.tlow}</td>
+                        </tr>
+                    </table>
+                </div>
+	`;
 	$('.price-text').html(html);
 }
 
 function getStock(q){
 	let query = {
 		symbol: q,
-		function: stockWeek.path,
+		function: stockDay.path,
 		outputsize: 'full',
 		apikey: stockKey
 	};
-	$.getJSON(stockURL,query,function(data){
-		console.log(data);
-		let fullData = data[stockWeek.json];
-		let arrayData = [];
+	$.getJSON(stockURL,query,function(data) {
+        console.log(data);
+        let fullData = data[stockDay.json];
+        let arrayData = [];
 
-		Object.keys(fullData).map(function(key){
-			let obj = new Object;
-			obj = fixKeys(fullData[key]);
-			obj['date'] = key;
-			arrayData.push(obj);
-		});
-		let todayData = arrayData[0];
+        //put results into an array of objects
+        Object.keys(fullData).map(function (key) {
+            let obj = new Object;
+            obj = fixKeys(fullData[key]);
+            obj['date'] = key;
+            arrayData.push(obj);
+        });
+        let todayData = arrayData[0];
+        let graphLabels ={
+            '1W': [],
+            '1M': [],
+            '3M': [],
+            '1Y': [],
+            '5Y': []
+        };
+        let graphData ={
+            '1W': [],
+            '1M': [],
+            '3M': [],
+            '1Y': [],
+            '5Y': []
+        };
 
-		//get 52 week high and lows
-		let arrayLow = [];
-		let arrayHigh = [];
-		let arrayVol = 0;
-		for (let i=0;i<52 && i<arrayData.length;i++){
-			arrayLow.push(parseInt(arrayData[i].low));
-			arrayHigh.push(parseInt(arrayData[i].high));
-			arrayVol += parseInt(arrayData[i].volume);
-		}
-		todayData['tlow'] = Math.min.apply(null,arrayLow);
-		todayData['thigh'] = Math.max.apply(null,arrayLow);
-		todayData['tVol'] = arrayVol/arrayData.length;
+        for(let i=0;i<arrayData.length;i++){
+           if(moment(arrayData[i].date).isAfter(moment().subtract(1,'months').format("YYYY-MM-DD"))){
+                graphLabels['1M'].unshift(arrayData[i].date);
+                graphData['1M'].unshift(arrayData[i].close);
+           }
+        }
+        console.log(graphLabels);
+        console.log(graphData);
 
-		console.log(arrayData);
-		let graphLabels = ["one","two","three"];
-		let graphData = [1,2,3];
-		renderTable(q,todayData);
-		renderGraph(myChart,graphLabels,graphData);
-	});
+        //get 52 week high and lows
+        let arrayLow = [];
+        let arrayHigh = [];
+        let arrayVol = 0;
+        for (let i = 0; i < 365 && i < arrayData.length; i++) {
+            arrayLow.push(parseInt(arrayData[i].low));
+            arrayHigh.push(parseInt(arrayData[i].high));
+            arrayVol += parseInt(arrayData[i].volume);
+        }
+        todayData['tlow'] = Math.min.apply(null, arrayLow);
+        todayData['thigh'] = Math.max.apply(null, arrayLow);
+        todayData['tVol'] = arrayVol / arrayData.length;
+
+
+        renderTable(q, todayData);
+
+        renderGraph(stockChart,graphLabels['1M'],graphData['1M']);
+    });
 }
 
 function getNews(q){
 	let query = {
 		apiKey: newsKey,
 		country: 'us',
-		category: 'technology'
+        q: q
 	};
-
-	if(q in symList) {
-        query['q'] = symList[q].split(' ')[0];
-    }
-	else{
-		query['q'] = q
-	}
-	query['q'] = 'google';
 	$.getJSON(newsURL,query,function(data){
-		renderNews(data);
-
+	    console.log(data);
+	    renderNews(data);
 	});
 }
 
@@ -125,7 +191,7 @@ function getWiki(q){
 		prop: 'extracts|pageimages',
 		indexpageids: 1,
 		redirects: 1,
-		exchars: 1200,
+		exchars: 800,
 		// explaintext: 1,
 		exsectionformat: 'plain',
 		piprop: 'name|thumbnail|original',
@@ -136,7 +202,7 @@ function getWiki(q){
 	$.getJSON(wikiURL,query,function(data){
 		console.log(data);
 		let wikiObj = data.query.pages[data.query.pageids[0]];
-		wikiObj['url'] = "https://en.wikipedia.org/wiki/";
+		wikiObj['url'] = "https://en.wikipedia.org/wiki/" + wikiObj.title;
 		renderWiki(wikiObj);
 	});
 }
@@ -194,16 +260,16 @@ function renderGraph(chart, label, data) {
     chart.update();
 }
 
-function graphStock(data){
-	myChart = new Chart(
+function initGraph(labels,data){
+	stockChart = new Chart(
 			$(".chart-js"),
 			{"type":"line",
-				"data":{"labels":["January","February","March","April","May","June","July"],
+				"data":{"labels":labels, //array of labels
 					"datasets":[
 						{"label":"Symbol",
-							"data":data,
+							"data":data, //array of data
 							"fill":false,
-							"borderColor":"rgb(75, 192, 192)",
+							"borderColor":"rgb(255, 255, 255)",
 							"lineTension":0.1}
 							]},
 				"options":{
@@ -212,8 +278,12 @@ function graphStock(data){
 					},
 					scales:{
 						xAxes:[{
+						    type: 'time',
+                            distribution: 'series',
+                            bounds: 'data',
 							ticks: {
-                                display: true //set to false to remove x axis labels
+                                source: 'data',
+						        display: true //set to false to remove x axis labels
                             }
 						}]
 					}}
@@ -225,7 +295,7 @@ function graphStock(data){
 
 function handlePage(){
 	getSymbols(symList); //pull array of symbols and company names
-	graphStock(initData);
+	initGraph(initLabels,initData);
 	handleSearch();
 	handleTime();
 }
