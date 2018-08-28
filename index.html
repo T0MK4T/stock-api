@@ -3,12 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-        <title>Stock Lookup</title>
+        <title>WolfLink Analytics</title>
         <link href="style.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <header role="banner">
+            <h1 class="app-title">WolfLink Analytics</h1>
             <img class="logo" src="logo.png" alt="logo"/>
             <form class="search-form">
                 <input type="text" name="search-bar" class="search-bar" placeholder="Enter Stock to Search">
@@ -18,21 +19,7 @@
         <main>
             <section class="price-text col-12">
                 <div class="price-header">
-                    <span class="current-symbol col-6">Search</span>
-                    <span class="current-price col-6">For a Stock Symbol</span>
-                </div>
-                <div class="price-details">
-                    <table>
-                        <tr>
-                            <td>Show</td>
-                            <td>High</td>
-                        </tr>
-                        <tr>
-                            <td>and</td>
-                            <td>Low</td>
-                        </tr>
-                    </table>
-
+                    <span class="current-symbol col-12 center">Become a Wolf of Wallstreet</span>
                 </div>
             </section>
             <section class="graph">
@@ -45,27 +32,22 @@
                 </form>
                 <canvas class="chart-js col-12"></canvas>
             </section>
-            <section class="company-info col-6">
-                <div class="company-wiki">
-                    <h1 class="company-name"></h1>
+            <section class="company-info">
+                <div class="company-wiki col-5">
+                    <h1 class="company-name">About the Company</h1>
                     <div class="wiki-article card-style">
                         <p>An About article for the company will be pulled</p>
                     </div>
                 </div>
-                <div class="company-news">
+                <div class="company-news col-5">
                     <h1>Recent News</h1>
-                    <a class="news-article card-style">
+                    <a class="news-article card-style center">
                         <div class="article-about">
-                            <h2 class="article-title">Along with </h2>
-                            <ul>
-                                <li></li>
-                                <li></li>
-                            </ul>
-
+                            <h2 class="article-title">Along with</h2>
                         </div>
                     </a>
-                    <a class="news-article">
-                        <div class="article-about card-style">
+                    <a class="news-article card-style center">
+                        <div class="article-about">
                             <h2 class="article-title">Breaking News Articles</h2>
                             <ul>
                                 <li></li>

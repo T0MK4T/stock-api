@@ -8,12 +8,20 @@ const stockDay = {json: 'Time Series (Daily)', path: 'TIME_SERIES_DAILY'};
 const stockWeek = {json:'Weekly Time Series',path: 'TIME_SERIES_WEEKLY'};
 const stockMonth = {json: 'Monthly Time Series',path:'TIME_SERIES_MONTHLY'};
 const symList = new Object;
-//let initData = {"AMZN":[],"APPL":[],"GOOG":[],"MSFT":[],"NFLX":[],"TSLA":[]}
-let initData = {"AMZN":[]};
+let initData = [{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[123,145,134,167,189]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,146,161,164,175]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,23,156,89,75]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,123,101,84,55]}];
 let stockChart;
+let loopGraph
+let i=1;
 let graphLabels ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
 let graphData ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
 
+function renderError(strAPI,element){
+    let html = `
+            <h1>We seem to be having some technical difficulties</h1>
+            <p>The ${strAPI} appears to be down or not functioning</p>
+        `;
+    $(element).html(html);
+}
 
 function renderWiki(data){
 	let html;
@@ -25,21 +33,25 @@ function renderWiki(data){
         if(data.thumbnail === undefined || data.thumbnail === null){
             html = `
 			    <h1 class="company-name">About ${data.title}</h1>
-                    <div class="wiki-article card-style">
-                        <p class="company-about">
-                            ${data.extract}
-                        </p>
-                    </div>
+                   <a target="_blank" href = ${data.url}>
+                        <div class="wiki-article card-style">
+                            <p class="company-about">
+                                ${data.extract}
+                            </p>
+                        </div>
+                    </a>
 	        `;
         }else {
             html = `
 			    <h1 class="company-name">About ${data.title}</h1>
-                    <div class="wiki-article card-style">
-                        <img class = "company-img" src=${data.thumbnail.source} alt=${data.title}/>
-                        <p class="company-about">
-                            ${data.extract}
-                        </p>
-                    </div>
+                    <a target="_blank" href = ${data.url}>
+                        <div class="wiki-article card-style">
+                            <img class = "company-img" src=${data.thumbnail.source} alt=${data.title}/>
+                            <p class="company-about">
+                                ${data.extract}
+                            </p>
+                        </div>
+                    </a>
 	        `;
         }
     }
@@ -78,27 +90,27 @@ function renderTable(sym,todayData){
 	let html = `
             <div class="price-header">
                     <span class="current-symbol col-6">${sym}</span>
-                    <span class="current-price col-6">${todayData.close}</span>
+                    <span class="current-price col-6">$${todayData.close}</span>
                 </div>
                 <div class="price-details">
                     <table>
                         <tr>
-                            <td>High: </td>
-                            <td>${todayData.high}</td>
+                            <th>High: </th>
+                            <td>$${todayData.high}</td>
                         </tr>
                         <tr>
-                            <td>Low: </td>
-                            <td>${todayData.low}</td>
+                            <th>Low: </th>
+                            <td>$${todayData.low}</td>
                         </tr>
                     </table>
                     <table>
                         <tr>
-                            <td>52 Wk High: </td>
-                            <td>${todayData.thigh}</td>
+                            <th>52 Wk High: </th>
+                            <td>$${todayData.thigh}</td>
                         </tr>
                         <tr>
-                            <td>52 Wk Low: </td>
-                            <td>${todayData.tlow}</td>
+                            <th>52 Wk Low: </th>
+                            <td>$${todayData.tlow}</td>
                         </tr>
                     </table>
                 </div>
@@ -106,30 +118,6 @@ function renderTable(sym,todayData){
 	$('.price-text').html(html);
 }
 
-function getStock2(q,callback){
-	let query = {
-		symbol: q,
-		function: stockDay.path,
-		outputsize: 'full',
-		apikey: stockKey
-	};
-	$.getJSON(stockURL,query,callback);
-}
-
-function manData(data) {
-    console.log(data);
-    let fullData = data[stockDay.json];
-    let arrayData = [];
-
-    //put results into an array of objects
-    Object.keys(fullData).map(function (key) {
-        let obj = new Object;
-        obj = fixKeys(fullData[key]);
-        obj['date'] = key;
-        arrayData.push(obj);
-    });
-    return ["testing",arrayData];
-}
 function getStock(q){
 	let query = {
 		symbol: q,
@@ -188,7 +176,9 @@ function getStock(q){
         todayData['tVol'] = arrayVol / arrayData.length;
         renderTable(q, todayData);
         renderGraph(stockChart,graphLabels['1M'],graphData['1M']);
-    });
+        $(".time-button:contains('1M')").addClass('graph-select');
+    })
+    .error(function() { renderError('Stock API','.price-text'); hideGraph();})
 }
 
 function getNews(q){
@@ -211,7 +201,7 @@ function getWiki(q){
 		prop: 'extracts|pageimages',
 		indexpageids: 1,
 		redirects: 1,
-		exchars: 800,
+		exchars: 400,
 		// explaintext: 1,
 		exsectionformat: 'plain',
 		piprop: 'name|thumbnail|original',
@@ -224,15 +214,17 @@ function getWiki(q){
 		let wikiObj = data.query.pages[data.query.pageids[0]];
 		wikiObj['url'] = "https://en.wikipedia.org/wiki/" + wikiObj.title;
 		renderWiki(wikiObj);
-	});
+	})
+    .error(function() { renderError('Wiki API','.company-wiki'); })
 }
 
 function handleSearch(){
 	$('.search-form').on('submit',(function(event){
 		event.preventDefault();
+		clearInterval(loopGraph); //stop the looping of initial data
 		let query = $('.search-bar').val();
 		let userSearch = matchSymbol(query);
-
+        $('.search-bar').val("");
 		getStock(userSearch.symbol);
 		getNews(userSearch.name);
 		getWiki(userSearch.name);
@@ -279,13 +271,17 @@ function getSymbols(lis){
 	});
 }
 
+function hideGraph(){
+    $(".graph").removeClass('load');
+}
+
 function renderGraph(chart, label, data) {
     chart.data.labels = label;
     chart.data.datasets.forEach((dataset) => {
     	dataset.data = data;
     });
-    //chart.update({easing: 'easeOutBounce'});
     chart.update();
+
 }
 
 function initGraph(){
@@ -293,10 +289,10 @@ function initGraph(){
     stockChart = new Chart(
 			$(".chart-js"),
 			{"type":"line",
-				"data":{"labels":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"], //array of labels
+				"data":{"labels":initData[0].date, //array of labels
 					"datasets":[
 						{"label":"Symbol",
-							"data":[123,145,134,167,189], //array of data
+							"data":initData[0].data, //array of data
 							"fill":false,
 							"borderColor":"rgb(255, 255, 255)",
 							"lineTension":0.1}
@@ -311,11 +307,17 @@ function initGraph(){
 						display: false
 					},
 					scales:{
+			            yAxes:[{
+			               ticks:{
+			                   fontColor:"white"
+                           }
+                        }],
 						xAxes:[{
 						    type: 'time',
                             distribution: 'series',
                             bounds: 'data',
 							ticks: {
+						        fontColor:"white",
                                 source: 'data',
 						        display: true //set to false to remove x axis labels
                             }
@@ -329,6 +331,14 @@ function splashIntro(){
     initGraph();
     $(".graph").addClass('load');
     $(".company-info").addClass('load');
+    loopGraph = setInterval(introGraph,6000);
+}
+function introGraph(){
+    renderGraph(stockChart,initData[i].date,initData[i].data);
+        i++;
+        if(i>=initData.length){
+            i=0;
+        }
 }
 
 function handlePage(){

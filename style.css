@@ -5,6 +5,9 @@ a{
     text-decoration: none;
     color: inherit;
 }
+th{
+    font-size: 1.3em;
+}
 .center{
     text-align: center;
 }
@@ -16,6 +19,10 @@ body{
     background: -webkit-linear-gradient(45deg, #06876f 0%,#206f87 20%,#2187b7 40%,#4f97ef 60%,#5dc4fc 80%,#46fcfc 100%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(45deg, #06876f 0%,#206f87 20%,#2187b7 40%,#4f97ef 60%,#5dc4fc 80%,#46fcfc 100%);
 }
+.app-title{
+    color:white;
+    font-size: 36px;
+}
 header{
     display: flex;
     flex-direction: column;
@@ -23,6 +30,7 @@ header{
 }
 .logo{
     width: 120px;
+    margin: 15px 0;
 }
 .search-bar{
     border: none;
@@ -49,7 +57,8 @@ header{
 }
 
 main{
-
+    max-width: 1000px;
+    margin: 0 auto;
 }
 .price-text{
     opacity: 0;
@@ -57,9 +66,11 @@ main{
 
     color: white;
     padding: 0 10px;
-    margin: 20px 0;
+    margin: 20px auto;
+    text-align: center;
+    max-width: 600px;
 }
-.load{
+.load, .graph.load, .company-info.load{
     opacity: 1;
 }
 .current-price{
@@ -77,26 +88,28 @@ main{
         justify-content: space-between;
         padding-top: 15px;
 }
-.graph, .company-info{
+.graph{
     opacity: 0;
     transition: opacity 2s ease-in;
 }
-.graph.load{
-    opacity: 1;
-}
-.company-info.load{
-    opacity: 1;
+.company-info{
+    opacity: 0;
+    transition: opacity 2s ease-in;
+    display:flex;
+    justify-content: space-between;
+    padding: 0 10px;
 }
 .chart-js{
-    height: 200px;
+    /*height: 200px;*/
     padding-right: 7px;
+    margin: 10px 0;
 }
 .graph-buttons{
     display: flex;
     justify-content: space-evenly;
     padding: 10px 0;
 }
-.graph-buttons button{
+.time-button{
     color: white;
     font-family: inherit;
     border: none;
@@ -112,6 +125,7 @@ main{
     outline: none;
     border-radius: 50px;
 }
+
 .card-style{
     background-color: rgba(255,255,255,.8);
     border-radius: 10px;
@@ -119,6 +133,11 @@ main{
 .wiki-article{
     padding: 10px;
 }
+.company-about{
+        padding: 0 5px;
+        font-size: 12px;
+        text-align: justify;
+    }
 .company-news h1, .company-name{
     color: white;
 }
@@ -153,11 +172,6 @@ main{
 
 }
 
-/*
-.company-news{
-    height: 500px;
-    overflow-y: scroll;
-}*/
 .col-1 {width: 8.33%;}
 .col-2 {width: 16.66%;}
 .col-3 {width: 25%;}
@@ -171,28 +185,27 @@ main{
 .col-11 {width: 91.66%;}
 .col-12 {width: 100%;}
 
-@media screen and (max-width: 370px){
+@media screen and (max-width: 768px){
     [class*="col-"] {
         width: 100%;
     }
-    body{
+        body{
         font-size: 14px;
     }
+    .app-title{
+        font-size: 24px;
+    }
     .logo{
-        width: 100px;
+        width: 120px;
     }
     .company-info{
-        display:flex;
         flex-direction: column;
-        padding: 0 10px;
     }
     .company-img{
         height: 100px;
     }
     .company-about{
-        padding: 0 5px;
         font-size: 12px;
-        text-align: justify;
     }
     .news-article{
         display: flex;
@@ -208,5 +221,18 @@ main{
     }
     .article-about p{
         display:none;
+    }
+}
+
+@media screen and (max-width: 375px){
+    .app-title{
+        font-size: 18px;
+    }
+    .logo{
+        width: 100px;
+    }
+    .news-article{
+        display: flex;
+        flex-wrap: wrap;
     }
 }
