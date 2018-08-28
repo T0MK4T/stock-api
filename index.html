@@ -5,42 +5,34 @@
         <meta name="viewport" content="width=device-width">
         <title>Stock Lookup</title>
         <link href="style.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <header role="banner">
             <img class="logo" src="logo.png" alt="logo"/>
             <form class="search-form">
                 <input type="text" name="search-bar" class="search-bar" placeholder="Enter Stock to Search">
-                <button type="submit" name="js-search-button" class="js-search-button">Search</button>
+                <button type="submit" name="js-search-button" class="js-search-button"><i class="fa fa-search"></i></button>
             </form>
         </header>
         <main>
             <section class="price-text col-12">
                 <div class="price-header">
-                    <span class="current-symbol col-6">MSFT</span>
-                    <span class="current-price col-6">$129.45</span>
+                    <span class="current-symbol col-6">Search</span>
+                    <span class="current-price col-6">For a Stock Symbol</span>
                 </div>
                 <div class="price-details">
                     <table>
                         <tr>
+                            <td>Show</td>
                             <td>High</td>
-                            <td>$120</td>
                         </tr>
                         <tr>
+                            <td>and</td>
                             <td>Low</td>
-                            <td>$120</td>
                         </tr>
                     </table>
-                    <table>
-                        <tr>
-                            <td>52 Wk High</td>
-                            <td>$120</td>
-                        </tr>
-                        <tr>
-                            <td>52 Wk Low</td>
-                            <td>$120</td>
-                        </tr>
-                    </table>
+
                 </div>
             </section>
             <section class="graph">
@@ -55,53 +47,31 @@
             </section>
             <section class="company-info col-6">
                 <div class="company-wiki">
-                    <h1 class="company-name">Microsoft</h1>
+                    <h1 class="company-name"></h1>
                     <div class="wiki-article card-style">
-                        <img class = "company-img" src="https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2016/04/building-1011876_1920.jpg" alt="company pic?"/>
-                        <p class="company-about">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tempus consequat nisl rutrum ullamcorper. Aenean non pretium lorem. Ut ac erat a arcu aliquam pretium. Sed at tempus ipsum, vel volutpat lacus. Duis molestie nisl ullamcorper nulla ornare accumsan. Curabitur nec aliquam urna. Nulla sed mauris quis odio tincidunt viverra eu nec lorem. Nam sodales suscipit mi. Maecenas cursus magna sit amet sem gravida iaculis. Maecenas aliquet elit metus, eget vehicula sem aliquet at. Aenean lacus mauris, ullamcorper eu risus eget, molestie cursus eros. Morbi quam lorem, luctus ac finibus quis, faucibus tincidunt massa.
-                        </p>
+                        <p>An About article for the company will be pulled</p>
                     </div>
                 </div>
                 <div class="company-news">
                     <h1>Recent News</h1>
                     <a class="news-article card-style">
-                        <img class="article-thumb" src="https://www.seoclerk.com/pics/399831-1fgnLO1444516150.jpg">
                         <div class="article-about">
-                            <h2 class="article-title">Article 1</h2>
+                            <h2 class="article-title">Along with </h2>
                             <ul>
-                                <li>Source</li>
-                                <li>8-27-2018</li>
+                                <li></li>
+                                <li></li>
                             </ul>
-                            <p>
-                                It can
-                            </p>
+
                         </div>
                     </a>
                     <a class="news-article">
-                        <img class="article-thumb" src="https://www.seoclerk.com/pics/399831-1fgnLO1444516150.jpg">
-                        <div class="article-about">
-                            <h2 class="article-title">Article 1</h2>
+                        <div class="article-about card-style">
+                            <h2 class="article-title">Breaking News Articles</h2>
                             <ul>
-                                <li>Source</li>
-                                <li>8-27-2018</li>
+                                <li></li>
+                                <li></li>
                             </ul>
-                            <p>
-                                consectetur adipiscing elit. Nunc tempus consequat nisl rutrum ullamcorper. Aenean non pretium lorem. Ut ac erat a
-                            </p>
-                        </div>
-                    </a>
-                    <a class="news-article">
-                        <img class="article-thumb" src="https://www.seoclerk.com/pics/399831-1fgnLO1444516150.jpg">
-                        <div class="article-about">
-                            <h2 class="article-title">Article 1</h2>
-                            <ul>
-                                <li>Source</li>
-                                <li>8-27-2018</li>
-                            </ul>
-                            <p>
-                                consectetur adipiscing elit. Nunc tempus consequat nisl rutrum ullamcorper. Aenean non pretium lorem. Ut ac erat a
-                            </p>
+
                         </div>
                     </a>
                 </div>

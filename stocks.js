@@ -8,24 +8,12 @@ const stockDay = {json: 'Time Series (Daily)', path: 'TIME_SERIES_DAILY'};
 const stockWeek = {json:'Weekly Time Series',path: 'TIME_SERIES_WEEKLY'};
 const stockMonth = {json: 'Monthly Time Series',path:'TIME_SERIES_MONTHLY'};
 const symList = new Object;
-let initLabels = ["one","two","three","four","five","six","seven","eight"]
-let initData = [123,34,45,45,46,56,57,5];
+//let initData = {"AMZN":[],"APPL":[],"GOOG":[],"MSFT":[],"NFLX":[],"TSLA":[]}
+let initData = {"AMZN":[]};
 let stockChart;
+let graphLabels ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
+let graphData ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
 
-function formDate(date){
-	let dd = date.getDate();
-	let mm = date.getMonth()+1;
-	let yyyy = date.getFullYear();
-
-	if(dd<10){
-		dd = '0'+dd;
-	}
-	if(mm<10){
-		mm = '0'+mm;
-	}
-	let fDate = `${yyyy}-${mm}-${dd}`
-	return fDate;
-}
 
 function renderWiki(data){
 	let html;
@@ -34,7 +22,17 @@ function renderWiki(data){
     if(!data.extract || data.extract.length<100){
         html = "<h1>No Wiki Information found</h1>";
     }else{
-         html = `
+        if(data.thumbnail === undefined || data.thumbnail === null){
+            html = `
+			    <h1 class="company-name">About ${data.title}</h1>
+                    <div class="wiki-article card-style">
+                        <p class="company-about">
+                            ${data.extract}
+                        </p>
+                    </div>
+	        `;
+        }else {
+            html = `
 			    <h1 class="company-name">About ${data.title}</h1>
                     <div class="wiki-article card-style">
                         <img class = "company-img" src=${data.thumbnail.source} alt=${data.title}/>
@@ -42,7 +40,8 @@ function renderWiki(data){
                             ${data.extract}
                         </p>
                     </div>
-	`;
+	        `;
+        }
     }
 
 	$('.company-wiki').html(html);
@@ -84,21 +83,21 @@ function renderTable(sym,todayData){
                 <div class="price-details">
                     <table>
                         <tr>
-                            <td>High</td>
+                            <td>High: </td>
                             <td>${todayData.high}</td>
                         </tr>
                         <tr>
-                            <td>Low</td>
+                            <td>Low: </td>
                             <td>${todayData.low}</td>
                         </tr>
                     </table>
                     <table>
                         <tr>
-                            <td>52 Wk High</td>
+                            <td>52 Wk High: </td>
                             <td>${todayData.thigh}</td>
                         </tr>
                         <tr>
-                            <td>52 Wk Low</td>
+                            <td>52 Wk Low: </td>
                             <td>${todayData.tlow}</td>
                         </tr>
                     </table>
@@ -107,6 +106,30 @@ function renderTable(sym,todayData){
 	$('.price-text').html(html);
 }
 
+function getStock2(q,callback){
+	let query = {
+		symbol: q,
+		function: stockDay.path,
+		outputsize: 'full',
+		apikey: stockKey
+	};
+	$.getJSON(stockURL,query,callback);
+}
+
+function manData(data) {
+    console.log(data);
+    let fullData = data[stockDay.json];
+    let arrayData = [];
+
+    //put results into an array of objects
+    Object.keys(fullData).map(function (key) {
+        let obj = new Object;
+        obj = fixKeys(fullData[key]);
+        obj['date'] = key;
+        arrayData.push(obj);
+    });
+    return ["testing",arrayData];
+}
 function getStock(q){
 	let query = {
 		symbol: q,
@@ -127,29 +150,29 @@ function getStock(q){
             arrayData.push(obj);
         });
         let todayData = arrayData[0];
-        let graphLabels ={
-            '1W': [],
-            '1M': [],
-            '3M': [],
-            '1Y': [],
-            '5Y': []
-        };
-        let graphData ={
-            '1W': [],
-            '1M': [],
-            '3M': [],
-            '1Y': [],
-            '5Y': []
-        };
 
         for(let i=0;i<arrayData.length;i++){
-           if(moment(arrayData[i].date).isAfter(moment().subtract(1,'months').format("YYYY-MM-DD"))){
+            if(moment(arrayData[i].date).isAfter(moment().subtract(1,'week').format("YYYY-MM-DD"))){
+                graphLabels['1W'].unshift(arrayData[i].date);
+                graphData['1W'].unshift(arrayData[i].close);
+           }
+            if(moment(arrayData[i].date).isAfter(moment().subtract(1,'months').format("YYYY-MM-DD"))){
                 graphLabels['1M'].unshift(arrayData[i].date);
                 graphData['1M'].unshift(arrayData[i].close);
            }
+           if(moment(arrayData[i].date).isAfter(moment().subtract(3,'months').format("YYYY-MM-DD"))){
+                graphLabels['3M'].unshift(arrayData[i].date);
+                graphData['3M'].unshift(arrayData[i].close);
+           }
+            if(moment(arrayData[i].date).isAfter(moment().subtract(1,'years').format("YYYY-MM-DD"))){
+                graphLabels['1Y'].unshift(arrayData[i].date);
+                graphData['1Y'].unshift(arrayData[i].close);
+           }
+            if(moment(arrayData[i].date).isAfter(moment().subtract(5,'years').format("YYYY-MM-DD"))){
+                graphLabels['5Y'].unshift(arrayData[i].date);
+                graphData['5Y'].unshift(arrayData[i].close);
+           }
         }
-        console.log(graphLabels);
-        console.log(graphData);
 
         //get 52 week high and lows
         let arrayLow = [];
@@ -163,10 +186,7 @@ function getStock(q){
         todayData['tlow'] = Math.min.apply(null, arrayLow);
         todayData['thigh'] = Math.max.apply(null, arrayLow);
         todayData['tVol'] = arrayVol / arrayData.length;
-
-
         renderTable(q, todayData);
-
         renderGraph(stockChart,graphLabels['1M'],graphData['1M']);
     });
 }
@@ -212,17 +232,24 @@ function handleSearch(){
 		event.preventDefault();
 		let query = $('.search-bar').val();
 		let userSearch = matchSymbol(query);
+
 		getStock(userSearch.symbol);
 		getNews(userSearch.name);
 		getWiki(userSearch.name);
 	}))
 }
 
-function handleTime(){
-	$('.time-button').on('click',(function(event){
-		console.log($(this).text());
-	}))
+function handleGraph(){
+    $('.time-button').on('click',function(event){
+        $('.time-button').removeClass('graph-select');
+        let timeScale = $(this).text();
+        console.log(timeScale);
+        $(this).addClass('graph-select');
+
+        renderGraph(stockChart,graphLabels[timeScale],graphData[timeScale]);
+    });
 }
+
 
 function fixKeys(obj){
 	Object.keys(obj).forEach(function(key){
@@ -257,22 +284,29 @@ function renderGraph(chart, label, data) {
     chart.data.datasets.forEach((dataset) => {
     	dataset.data = data;
     });
+    //chart.update({easing: 'easeOutBounce'});
     chart.update();
 }
 
-function initGraph(labels,data){
-	stockChart = new Chart(
+function initGraph(){
+
+    stockChart = new Chart(
 			$(".chart-js"),
 			{"type":"line",
-				"data":{"labels":labels, //array of labels
+				"data":{"labels":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"], //array of labels
 					"datasets":[
 						{"label":"Symbol",
-							"data":data, //array of data
+							"data":[123,145,134,167,189], //array of data
 							"fill":false,
 							"borderColor":"rgb(255, 255, 255)",
 							"lineTension":0.1}
 							]},
 				"options":{
+			        elements:{
+			          point:{
+			              radius: 0
+                      }
+                    },
 					legend:{
 						display: false
 					},
@@ -288,15 +322,19 @@ function initGraph(labels,data){
 						}]
 					}}
 			});
+}
 
-	//myChart.data.datasets[0].data[1] = 75;
-	//myChart.update({easing: 'easeOutBounce'});
+function splashIntro(){
+    $(".price-text").addClass('load');
+    initGraph();
+    $(".graph").addClass('load');
+    $(".company-info").addClass('load');
 }
 
 function handlePage(){
 	getSymbols(symList); //pull array of symbols and company names
-	initGraph(initLabels,initData);
+	splashIntro();
+	handleGraph();
 	handleSearch();
-	handleTime();
 }
 $(handlePage);
