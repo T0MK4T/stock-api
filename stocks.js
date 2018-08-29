@@ -31,7 +31,6 @@ function renderNoResult(sym){
 function renderWiki(data){
 	let html;
 
-	console.log(data);
     if(!data.extract || data.extract.length<100){
         html = "<h1>No Wiki Information found</h1>";
     }else{
@@ -131,7 +130,6 @@ function getStock(q){
 		apikey: stockKey
 	};
 	$.getJSON(stockURL,query,function(data) {
-        console.log(data);
         let fullData = data[stockDay.json];
         let arrayData = [];
 
@@ -195,7 +193,6 @@ function getNews(q){
         q: q
 	};
 	$.getJSON(newsURL,query,function(data){
-	    console.log(data);
 	    renderNews(data);
 	})
     .fail(function() { renderError('News API','.company-news');});
@@ -218,7 +215,6 @@ function getWiki(q){
 
 	}
 	$.getJSON(wikiURL,query,function(data){
-		console.log(data);
 		let wikiObj = data.query.pages[data.query.pageids[0]];
 		wikiObj['url'] = "https://en.wikipedia.org/wiki/" + wikiObj.title;
 		renderWiki(wikiObj);
@@ -247,7 +243,6 @@ function handleGraph(){
     $('.time-button').on('click',function(event){
         $('.time-button').removeClass('graph-select');
         let timeScale = $(this).text();
-        console.log(timeScale);
         $(this).addClass('graph-select');
 
         renderGraph(stockChart,graphLabels[timeScale],graphData[timeScale]);
