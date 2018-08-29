@@ -5,24 +5,29 @@ const symbolURL = 'https://api.iextrading.com/1.0/ref-data/symbols';
 const stockURL = 'https://www.alphavantage.co/query';
 const wikiURL = 'https://en.wikipedia.org/w/api.php';
 const stockDay = {json: 'Time Series (Daily)', path: 'TIME_SERIES_DAILY'};
-const stockWeek = {json:'Weekly Time Series',path: 'TIME_SERIES_WEEKLY'};
-const stockMonth = {json: 'Monthly Time Series',path:'TIME_SERIES_MONTHLY'};
 const symList = new Object;
 let initData = [{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[123,145,134,167,189]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,146,161,164,175]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,23,156,89,75]},{"date":["2018-04-01","2018-05-01","2018-06-01","2018-07-01","2018-08-01"],"data":[134,123,101,84,55]}];
 let stockChart;
-let loopGraph
+let loopGraph;
 let i=1;
-let graphLabels ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
-let graphData ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
+let graphLabels;
+let graphData;
 
 function renderError(strAPI,element){
     let html = `
-            <h1>We seem to be having some technical difficulties</h1>
-            <p>The ${strAPI} appears to be down or not functioning</p>
+            <h1 class="company-name">We seem to be having some technical difficulties</h1>
+            <p class="card-style">The ${strAPI} appears to be down or not functioning</p>
         `;
     $(element).html(html);
 }
-
+function renderNoResult(sym){
+ let html = `
+            <div class="price-header">
+                    <span class="current-symbol col-12 centered">No results found for "${sym}", please try a different symbol</span>
+                </div>
+                `;
+    $('.price-text').html(html);
+}
 function renderWiki(data){
 	let html;
 
@@ -138,7 +143,8 @@ function getStock(q){
             arrayData.push(obj);
         });
         let todayData = arrayData[0];
-
+        graphLabels ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
+        graphData ={'1W': [], '1M': [], '3M': [], '1Y': [], '5Y': []};
         for(let i=0;i<arrayData.length;i++){
             if(moment(arrayData[i].date).isAfter(moment().subtract(1,'week').format("YYYY-MM-DD"))){
                 graphLabels['1W'].unshift(arrayData[i].date);
@@ -177,8 +183,9 @@ function getStock(q){
         renderTable(q, todayData);
         renderGraph(stockChart,graphLabels['1M'],graphData['1M']);
         $(".time-button:contains('1M')").addClass('graph-select');
+        $(".graph").addClass('load');
     })
-    .error(function() { renderError('Stock API','.price-text'); hideGraph();})
+    .fail(function() { renderError('Stock API','.price-text'); hideGraph();});
 }
 
 function getNews(q){
@@ -190,7 +197,8 @@ function getNews(q){
 	$.getJSON(newsURL,query,function(data){
 	    console.log(data);
 	    renderNews(data);
-	});
+	})
+    .fail(function() { renderError('News API','.company-news');});
 }
 
 function getWiki(q){
@@ -215,7 +223,7 @@ function getWiki(q){
 		wikiObj['url'] = "https://en.wikipedia.org/wiki/" + wikiObj.title;
 		renderWiki(wikiObj);
 	})
-    .error(function() { renderError('Wiki API','.company-wiki'); })
+    .fail(function() { renderError('Wiki API','.company-wiki'); });
 }
 
 function handleSearch(){
@@ -225,9 +233,13 @@ function handleSearch(){
 		let query = $('.search-bar').val();
 		let userSearch = matchSymbol(query);
         $('.search-bar').val("");
-		getStock(userSearch.symbol);
-		getNews(userSearch.name);
-		getWiki(userSearch.name);
+        if(userSearch.symbol!=-1) {
+            getStock(userSearch.symbol);
+            getNews(userSearch.name);
+            getWiki(userSearch.name);
+        }else{
+            renderNoResult(query);
+        }
 	}))
 }
 
@@ -258,7 +270,9 @@ function matchSymbol(query){
 	if(query in symList){
 		returnObj['symbol'] = query;
 		returnObj['name'] = symList[query];
-	}
+	}else{
+	    returnObj['symbol'] = -1;
+    }
 	return returnObj;
 }
 
@@ -267,8 +281,8 @@ function getSymbols(lis){
 		data.forEach(function(ele){
 			lis[ele.symbol] = ele.name;
 		});
-	console.log(lis);
-	});
+	})
+    .fail(function() { renderError('Stock API','.price-text'); hideGraph();});
 }
 
 function hideGraph(){
